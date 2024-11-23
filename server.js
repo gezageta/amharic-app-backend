@@ -1,37 +1,38 @@
-require('dotenv').config();  // Load environment variables from a .env file
+// Import dependencies
 const express = require('express');
 const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config();  // Load environment variables from .env file
 
+// Create an Express app
 const app = express();
-const PORT = 5001;
-
-app.get('/', (req, res) => {
-  res.send({ message: 'Backend is working!' });
-});
+const PORT = process.env.PORT || 5001;  // Use environment variable for PORT if available
 
 // Middleware
 app.use(cors({
   origin: 'https://amharic-app.netlify.app',  // Allow your Netlify URL
-  methods: 'GET,POST',                         // Allow the required HTTP methods
+  methods: ['GET', 'POST'],                   // Allow the required HTTP methods
   credentials: true
 }));
+
+// Middleware for parsing JSON data
 app.use(express.json());  // Use built-in express body-parser for JSON data
 
-// Feedback route
+// Endpoint to handle feedback
 app.post('/send-feedback', (req, res) => {
   const { name, email, message } = req.body;
 
-  // Create transporter object using the default SMTP transport
+  // Nodemailer transporter setup
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,  // Use environment variable for email address
-      pass: process.env.EMAIL_PASS,  // Use environment variable for app-specific password
+      user: 'gezageta@gmail.com',              // Your email address
+      pass: process.env.GMAIL_APP_PASSWORD,    // Use app password from environment variable
     },
   });
 
-  // Set up email data
+  // Mail options
   const mailOptions = {
     from: email,
     to: 'gezageta@gmail.com',
@@ -39,7 +40,7 @@ app.post('/send-feedback', (req, res) => {
     text: message,
   };
 
-  // Send email
+  // Send mail
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error sending email:', error);
@@ -50,7 +51,7 @@ app.post('/send-feedback', (req, res) => {
   });
 });
 
-// Start server
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
