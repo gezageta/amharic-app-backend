@@ -6,6 +6,10 @@ const cors = require('cors');
 const app = express();
 const PORT = 5001;
 
+app.get('/', (req, res) => {
+  res.send({ message: 'Backend is working!' });
+});
+
 // Middleware
 app.use(cors({
   origin: 'https://amharic-app.netlify.app',  // Allow your Netlify URL
